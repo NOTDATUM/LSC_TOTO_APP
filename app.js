@@ -10,8 +10,9 @@ import {
 } from 'discord-interactions';
 import { 
   VerifyDiscordRequest, 
-  getRandomEmoji, 
-  DiscordRequest 
+  DiscordRequest, 
+  EditDashBoard,
+  MakeProgressBar,
 } from './utils.js';
 import {
   BET_COMMAND,
@@ -22,13 +23,18 @@ import {
   START_MODAL_COMMAND,
   INFO_COMMAND,
   END_COMMAND,
-  WIN_COMMAND,
+  RETURN_COMMAND,
 } from './commands.js';
 import {
   UserSchema,
   GameSchema,
   BetSchema,
 } from './model.js'
+import {
+  COLOR_BLACK,
+  COLOR_GREEN,
+  COLOR_RED,
+} from './color.js'
 
 const app = express();
 const PORT = process.env.PORT;
@@ -56,7 +62,7 @@ app.post('/interactions', async function (req, res) {
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: 'Hello World! ' + getRandomEmoji(),
+          content: '안녕하세요! 개발자 <@447617660562309130>입니다! 👋',
         },
       });
     }
@@ -253,7 +259,6 @@ app.post('/interactions', async function (req, res) {
           }
         })
       } else {  
-        await User.updateMany({spectate: false}, {spectate: true}) 
         return res.send({
           type: InteractionResponseType.APPLICATION_MODAL,
           data: {
@@ -319,6 +324,9 @@ app.post('/interactions', async function (req, res) {
         Game.findOne({'game_isVaild': true}, function(err, target_game){
           target_game.game_isVaild = false
           target_game.save()
+          const total_point = target_game.game_blue_team_point + target_game.game_red_team_point
+          const blue_perc = target_game.game_blue_team_point / total_point * 100
+          EditDashBoard(target_game.game_name, `베팅 종료`, target_game.game_blue_team_name, target_game.game_red_team_name, MakeProgressBar(blue_perc), blue_perc.toFixed(2), (total_point / target_game.game_blue_team_point).toFixed(2), target_game.game_blue_team_point, (100 - blue_perc.toFixed(2)).toFixed(2), (total_point / target_game.game_red_team_point).toFixed(2), target_game.game_red_team_point, COLOR_RED)
           return res.send({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {
@@ -330,7 +338,7 @@ app.post('/interactions', async function (req, res) {
       }
     }
 
-    if (name === 'win') {
+    if (name === 'return') {
       const userId = req.body.member.user.id;
       if (!(userId === process.env.ADMIN)){
         return res.send({
@@ -342,7 +350,47 @@ app.post('/interactions', async function (req, res) {
         });
       } else {
         await User.updateMany({spectate: true}, {spectate: false});
-        // 개발 필요
+        Game.findOne({'game_name': data.options[0].value}, function(err, target_game){
+          if (data.options[1].value == target_game.game_blue_team_name) {
+            Bet.find({'bet_game_name': data.options[0].value}, function(err, target_bets){
+              var index = 0;
+              while (index < target_bets.length) {
+                const bet = target_bets[index]
+                if (bet.bet_team == `(블루팀)`) {
+                  User.findOne({'discord_id': bet.discord_id}, async function(err, target_user) {
+                    target_user.point = target_user.point + (bet.bet_point * (target_game.game_red_team_point / target_game.game_blue_team_point + 1))
+                    await target_user.save()
+                  })
+                }
+                index = index + 1;
+              }
+            })
+          } else {
+            Bet.find({'bet_game_name': data.options[0].value}, function(err, target_bets){
+              var index = 0;
+              while (index < target_bets.length) {
+                const bet = target_bets[index]
+                if (bet.bet_team == `(레드팀)`) {
+                  User.findOne({'discord_id': bet.discord_id}, async function(err, target_user) {
+                    target_user.point = target_user.point + (bet.bet_point * (target_game.game_blue_team_point / target_game.game_red_team_point + 1))
+                    await target_user.save()
+                  })
+                }
+                index = index + 1;
+              }
+            })
+          }
+          const total_point = target_game.game_blue_team_point + target_game.game_red_team_point
+          const blue_perc = target_game.game_blue_team_point / total_point * 100
+          EditDashBoard(target_game.game_name, `경기 종료`, target_game.game_blue_team_name, target_game.game_red_team_name, MakeProgressBar(blue_perc), blue_perc.toFixed(2), (total_point / target_game.game_blue_team_point).toFixed(2), target_game.game_blue_team_point, (100 - blue_perc.toFixed(2)).toFixed(2), (total_point / target_game.game_red_team_point).toFixed(2), target_game.game_red_team_point, 0)
+          return res.send({
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            data: {
+              content: `(관리자) 정상적으로 처리되었습니다.`,
+              flags: InteractionResponseFlags.EPHEMERAL,
+            }
+          });
+        });
       }
     }
   }
@@ -431,6 +479,10 @@ app.post('/interactions', async function (req, res) {
               target_game.game_red_team_point = target_game.game_red_team_point + Number(bet_info[1]);
             }
             target_game.save()
+            
+            const total_point = target_game.game_blue_team_point + target_game.game_red_team_point
+            const blue_perc = target_game.game_blue_team_point / total_point * 100
+            EditDashBoard(target_game.game_name, `베팅 가능`, target_game.game_blue_team_name, target_game.game_red_team_name, MakeProgressBar(blue_perc), blue_perc.toFixed(2), (total_point / target_game.game_blue_team_point).toFixed(2), target_game.game_blue_team_point, (100 - blue_perc.toFixed(2)).toFixed(2), (total_point / target_game.game_red_team_point).toFixed(2), target_game.game_red_team_point, COLOR_GREEN)
 
             await res.send({
               type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -461,7 +513,13 @@ app.post('/interactions', async function (req, res) {
       User.findOne({'discord_id': userId}, function(err, target_user){
         Game.findOne({'game_isVaild': true}, function(err, target_game){
           if (target_user.point < data.components[0].components[0].value || data.components[0].components[0].value <= 0) {
-            console.log(`비정상`)
+            return res.send({
+              type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+              data: {
+                flags: InteractionResponseFlags.EPHEMERAL,
+                content: `베팅 금액이 유효하지 않거나 보유한 잔여 포인트가 부족합니다.`,
+              }
+            });
           } else {
             return res.send({
               type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -520,6 +578,9 @@ app.post('/interactions', async function (req, res) {
     }
 
     if (modalId === 'start_modal') {
+      await User.updateMany({spectate: false}, {spectate: true}) 
+      EditDashBoard(data.components[0].components[0].value, `베팅 가능`, data.components[1].components[0].value, data.components[2].components[0].value, `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜`, `0`, `0`, `0`, `0`, `0`, `0`, COLOR_GREEN)
+
       let modalValues = '';
       for (let action of data.components) {
         let inputComponent = action.components[0];
@@ -549,7 +610,7 @@ app.post('/interactions', async function (req, res) {
 
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);
-  
+
   HasGuildCommands(process.env.APP_ID, process.env.GUILD_ID, [
     HELLO_COMMAND,
     BET_COMMAND,
@@ -558,60 +619,6 @@ app.listen(PORT, () => {
     START_MODAL_COMMAND,
     INFO_COMMAND,
     END_COMMAND,
-    WIN_COMMAND,
+    RETURN_COMMAND,
   ]);
 });
-
-// 개발 필요
-// const endpoint = `/channels/975319344902995988/messages/975327107058110484`
-// DiscordRequest(endpoint, {
-//   method: 'PATCH',
-//   body: {
-//     embeds: [{
-//       author: {
-//         name: 'DASHBOARD'
-//       },
-//       title: `LSC_결승_1경기`,
-//       description: `현재 상태: 베팅 가능`,
-//       url: `https://twitch.com/`,
-//       fields: [
-//         {
-//           name: `BLUE`,
-//           value: `4시간도 안걸리노`,
-//           inline: true, 
-//         },
-//         {
-//           name: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
-//           value: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
-//           inline: true, 
-//         },
-//         {
-//           name: `RED`,
-//           value: `돌아온 재앙`,
-//           inline: true, 
-//         },
-//         {
-//           name: `🟦🟦🟦🟦🟦🟦🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥`,
-//           value: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤPROGRESS BARㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
-//           inline: false, 
-//         },
-//         {
-//           name: `30% (3000)`,
-//           value: `배율: 2.2`,
-//           inline: true, 
-//         },
-//         {
-//           name: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
-//           value: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
-//           inline: true, 
-//         },
-//         {
-//           name: `70% (7000)`,
-//           value: `배율: 1.3`,
-//           inline: true, 
-//         },
-//       ],
-//       color: `8388352` 
-//     }],
-//   },
-// });

@@ -77,8 +77,22 @@ export const END_COMMAND = {
   type: 1
 }
 
-export const WIN_COMMAND = {
-  name: 'win',
+export const RETURN_COMMAND = {
+  name: 'return',
   description: '(관리자) LSC 게임 종료 및 베팅 결과 리턴',
+  options: [
+    {
+        name: `game_name`,
+        description: `결과를 조회할 LSC 게임 선정`,
+        type: 3,
+        required: true,
+    },
+    {
+        name: `win_team`,
+        description: `승리팀 설정`,
+        type: 3,
+        required: true,
+    }
+  ],
   type: 1
 }
