@@ -34,7 +34,7 @@ export async function DiscordRequest(endpoint, options) {
 }
 
 export function EditDashBoard(title, bet_status, blue_team_name, red_team_name, progress_bar, blue_perc, blue_rate, blue_point, red_perc, red_rate, red_point, color) {
-  const endpoint = `/channels/975319344902995988/messages/975327107058110484`
+  const endpoint = `/channels/975744794468962314/messages/975749513425846302`
   DiscordRequest(endpoint, {
     method: 'PATCH',
     body: {
@@ -44,7 +44,7 @@ export function EditDashBoard(title, bet_status, blue_team_name, red_team_name, 
         },
         title: `${title}`,
         description: `현재 상태: ${bet_status}`,
-        url: `https://twitch.com/`,
+        url: `https://youtu.be/heLpIXRzNr0`, // 변경 예정
         fields: [
           {
             name: `BLUE`,
@@ -52,8 +52,8 @@ export function EditDashBoard(title, bet_status, blue_team_name, red_team_name, 
             inline: true, 
           },
           {
-            name: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
-            value: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
+            name: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
+            value: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
             inline: true, 
           },
           {
@@ -72,8 +72,8 @@ export function EditDashBoard(title, bet_status, blue_team_name, red_team_name, 
             inline: true, 
           },
           {
-            name: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
-            value: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
+            name: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
+            value: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ`,
             inline: true, 
           },
           {

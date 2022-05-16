@@ -161,7 +161,7 @@ app.post('/interactions', async function (req, res) {
       })
     }
 
-    if (name === 'information') {
+    if (name === 'info') {
       const userId = req.body.member.user.id;
       User.findOne({'discord_id': userId}, function(err, target_user){
         if (!target_user) {
@@ -358,7 +358,7 @@ app.post('/interactions', async function (req, res) {
                 const bet = target_bets[index]
                 if (bet.bet_team == `(블루팀)`) {
                   User.findOne({'discord_id': bet.discord_id}, async function(err, target_user) {
-                    target_user.point = target_user.point + (bet.bet_point * (target_game.game_red_team_point / target_game.game_blue_team_point + 1))
+                    target_user.point = target_user.point + (bet.bet_point * (target_game.game_red_team_point / target_game.game_blue_team_point + 1)).toFixed(0)
                     await target_user.save()
                   })
                 }

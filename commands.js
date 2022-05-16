@@ -36,60 +36,60 @@ export async function InstallGuildCommand(appId, guildId, command) {
 }
 
 export const HELLO_COMMAND = {
-  name: 'hello',
-  description: 'Hello World!',
+  name: 'test',
+  description: 'test command (checking ngrok protocall)',
   type: 1,
 };
 
 export const SPECTATE_COMMAND = {
   name: 'spectate',
-  description: '경기 관전 (100포인트)',
+  description: '[LSC-TOTO] 경기 관전 (100p 획득)',
   type: 1,
 };
 
 export const BET_COMMAND = {
   name: 'bet',
-  description: 'LSC 승부예측 베팅',
+  description: '[LSC-TOTO] 베팅',
   type: 1,
 };
 
 export const REGISTER_MODAL_COMMAND = {
   name: 'register',
-  description: 'LSC 승부예측 회원가입',
+  description: '[LSC-TOTO] 회원가입',
   type: 1,
 }
 
 export const START_MODAL_COMMAND = {
   name: 'start',
-  description: '(관리자) LSC 게임 시작 설정',
+  description: '(ADMIN) [LSC-GAME] start setting',
   type: 1,
 }
 
 export const INFO_COMMAND = {
-  name: 'information',
-  description: '사용자 정보 확인',
+  name: 'info',
+  description: 'LSC-TOTO 사용자 정보 (본인)',
   type: 1,
 }
 
 export const END_COMMAND = {
   name: 'end',
-  description: '(관리자) LSC 베팅 가능 시간 종료',
+  description: '(ADMIN) [LSC-GAME] stop bet system',
   type: 1
 }
 
 export const RETURN_COMMAND = {
   name: 'return',
-  description: '(관리자) LSC 게임 종료 및 베팅 결과 리턴',
+  description: '(ADMIN) [LSC-GAME] end game & return bets',
   options: [
     {
         name: `game_name`,
-        description: `결과를 조회할 LSC 게임 선정`,
+        description: `(ADMIN) [LSC-GAME] game-name`,
         type: 3,
         required: true,
     },
     {
         name: `win_team`,
-        description: `승리팀 설정`,
+        description: `(ADMIN) [LSC-GAME] win-team`,
         type: 3,
         required: true,
     }
