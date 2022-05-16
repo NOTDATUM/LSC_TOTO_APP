@@ -272,7 +272,7 @@ app.post('/interactions', async function (req, res) {
                     type: MessageComponentTypes.INPUT_TEXT,
                     custom_id: 'LSC 게임명',
                     style: 1,
-                    label: '게임명 - 예) LSC_4강A_1경기',
+                    label: '게임명 - 예) LSC-4강A-1경기',
                     max_length: 100, 
                     require: true,
                   },
