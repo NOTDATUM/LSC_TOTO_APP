@@ -6,7 +6,7 @@ export const UserSchema = new mongoose.Schema({
     student_nick: { type: String, required: true },
     discord_id: { type: Number, required: true },
     point: { type: Number, required: true, default: 0 },
-    spectate: { type: Boolean, required: true, default: false }
+    spectate: { type: Boolean, required: true, default: true }
 });
 
 export const GameSchema = new mongoose.Schema({

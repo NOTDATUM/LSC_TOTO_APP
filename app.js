@@ -626,7 +626,7 @@ app.listen(PORT, () => {
   DiscordRequest(endpoint, {
     method: 'POST',
     body: {
-      content: `[OFFLINE] 봇 오프라인 상태입니다.`
+      content: `[RELOAD] 봇 재시작 완료했습니다.`
     }
   });
 });
