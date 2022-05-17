@@ -621,4 +621,12 @@ app.listen(PORT, () => {
     END_COMMAND,
     RETURN_COMMAND,
   ]);
+
+  const endpoint = `/channels/975744835581542480/messages`
+  DiscordRequest(endpoint, {
+    method: 'POST',
+    body: {
+      content: `[OFFLINE] 봇 오프라인 상태입니다.`
+    }
+  });
 });
